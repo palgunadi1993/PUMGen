@@ -370,15 +370,15 @@ int main(int argc, char* argv[]) {
   apf::MeshTag* boundaryTag = mesh->findTag("boundary condition");
   assert(boundaryTag);
 
-  int* boundary = new int[localSize[0]];
-  memset(boundary, 0, localSize[0] * sizeof(int));
+  int64_t* boundary = new int64_t[localSize[0]];
+  memset(boundary, 0, localSize[0] * sizeof(int64_t));
 
   sizes[0] = globalSize[0];
   h5space = H5Screate_simple(1, sizes, 0L);
   checkH5Err(h5space);
 
-  hid_t h5boundary =
-      H5Dcreate(h5file, "/boundary", H5T_STD_I32LE, h5space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+  hid_t h5boundary = 
+      H5Dcreate(h5file, "/boundary", H5T_STD_I64LE, h5space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
   checkH5Err(h5boundary);
 
   start[0] = offsets[0];
@@ -400,10 +400,10 @@ int main(int argc, char* argv[]) {
         int b;
         mesh->getIntTag(faces[i], boundaryTag, &b);
 
-        if (b <= 0 || b > std::numeric_limits<unsigned char>::max())
+        if (b <= 0 || b > std::numeric_limits<unsigned short>::max())
           logError() << "Cannot handle boundary condition" << b;
 
-        boundary[index] += b << (i * 8);
+        boundary[index] += b << (i * 16);
       }
     }
 
@@ -411,7 +411,7 @@ int main(int argc, char* argv[]) {
   }
   mesh->end(it);
 
-  checkH5Err(H5Dwrite(h5boundary, H5T_NATIVE_INT, h5memspace, h5space, h5dxlist, boundary));
+  checkH5Err(H5Dwrite(h5boundary, H5T_NATIVE_INT64, h5memspace, h5space, h5dxlist, boundary));
 
   checkH5Err(H5Sclose(h5space));
   checkH5Err(H5Sclose(h5memspace));
