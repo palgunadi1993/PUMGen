@@ -332,7 +332,7 @@ int main(int argc, char* argv[]) {
     checkH5Err(h5space);
 
     hid_t h5group =
-        H5Dcreate(h5file, "/group", H5T_STD_I32LE, h5space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        H5Dcreate(h5file, "/group", H5T_STD_I64LE, h5space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     checkH5Err(h5group);
 
     start[0] = offsets[0];
@@ -354,7 +354,7 @@ int main(int argc, char* argv[]) {
     }
     mesh->end(it);
 
-    checkH5Err(H5Dwrite(h5group, H5T_NATIVE_INT, h5memspace, h5space, h5dxlist, group));
+    checkH5Err(H5Dwrite(h5group, H5T_NATIVE_INT64, h5memspace, h5space, h5dxlist, group));
 
     checkH5Err(H5Sclose(h5space));
     checkH5Err(H5Sclose(h5memspace));
