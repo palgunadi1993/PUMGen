@@ -332,7 +332,7 @@ int main(int argc, char* argv[]) {
     checkH5Err(h5space);
 
     hid_t h5group =
-        H5Dcreate(h5file, "/group", H5T_STD_I64LE, h5space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
+        H5Dcreate(h5file, "/group", H5T_STD_I32LE, h5space, H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
     checkH5Err(h5group);
 
     start[0] = offsets[0];
@@ -343,20 +343,18 @@ int main(int argc, char* argv[]) {
     h5memspace = H5Screate_simple(1, sizes, 0L);
     checkH5Err(h5memspace);
 
-    int64_t* group = new int64_t[localSize[0]];
+    int* group = new int[localSize[0]];
     it = mesh->begin(3);
     index = 0;
     while (apf::MeshEntity* element = mesh->iterate(it)) {
       assert(mesh->hasTag(element, groupTag));
       
-      int myGroup;
-      mesh->getIntTag(element, groupTag, &myGroup);
-      group[index] = static_cast<int64_t>(myGroup);
+      mesh->getIntTag(element, groupTag, &group[index]);
       index++;
     }
     mesh->end(it);
 
-    checkH5Err(H5Dwrite(h5group, H5T_NATIVE_INT64, h5memspace, h5space, h5dxlist, group));
+    checkH5Err(H5Dwrite(h5group, H5T_NATIVE_INT32, h5memspace, h5space, h5dxlist, group));
 
     checkH5Err(H5Sclose(h5space));
     checkH5Err(H5Sclose(h5memspace));
