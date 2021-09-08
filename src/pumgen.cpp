@@ -343,13 +343,15 @@ int main(int argc, char* argv[]) {
     h5memspace = H5Screate_simple(1, sizes, 0L);
     checkH5Err(h5memspace);
 
-    int* group = new int[localSize[0]];
+    int64_t* group = new int64_t[localSize[0]];
     it = mesh->begin(3);
     index = 0;
     while (apf::MeshEntity* element = mesh->iterate(it)) {
       assert(mesh->hasTag(element, groupTag));
-
-      mesh->getIntTag(element, groupTag, &group[index]);
+      
+      int myGroup;
+      mesh->getIntTag(element, groupTag, &myGroup);
+      group[index] = static_cast<int64_t>(myGroup);
       index++;
     }
     mesh->end(it);
@@ -397,8 +399,10 @@ int main(int argc, char* argv[]) {
 
     for (unsigned int i = 0; i < 4; i++) {
       if (mesh->hasTag(faces[i], boundaryTag)) {
-        int b;
-        mesh->getIntTag(faces[i], boundaryTag, &b);
+        int ba;
+        int64_t b;
+        mesh->getIntTag(faces[i], boundaryTag, &ba);
+        b = static_cast<int64_t>(ba);
 
         if (b <= 0 || b > std::numeric_limits<unsigned short>::max())
           logError() << "Cannot handle boundary condition" << b;
